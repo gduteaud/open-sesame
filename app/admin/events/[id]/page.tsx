@@ -64,7 +64,7 @@ export default async function AdminEventDetailPage({ params }: PageProps) {
             </h1>
             <p className="text-muted-foreground text-sm">
               {formatFullDate(event.eventDate)} · Per-key limit:{" "}
-              {event.perKeyCredits} USD · slug: {event.slug}
+              {event.perKeyCredits} USD · Slug: {event.slug}
             </p>
           </div>
           <Link

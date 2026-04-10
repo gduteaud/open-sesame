@@ -6,6 +6,8 @@ export type ProvisionKeyResult = {
 export async function provisionOpenRouterKey(params: {
   name: string;
   limitUsd: number;
+  /** ISO 8601 UTC (OpenRouter rejects non-UTC offsets). */
+  expiresAtIso: string;
 }): Promise<ProvisionKeyResult> {
   const managementKey = process.env.OPENROUTER_MANAGEMENT_KEY;
   if (!managementKey) {
@@ -21,6 +23,7 @@ export async function provisionOpenRouterKey(params: {
     body: JSON.stringify({
       name: params.name,
       limit: params.limitUsd,
+      expires_at: params.expiresAtIso,
     }),
   });
 

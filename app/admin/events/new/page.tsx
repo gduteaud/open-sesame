@@ -10,7 +10,6 @@ import { Label } from "@/components/ui/label";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
@@ -21,7 +20,7 @@ export default function NewEventPage() {
   const router = useRouter();
   const [name, setName] = useState("");
   const [date, setDate] = useState("");
-  const [perKeyCredits, setPerKeyCredits] = useState("10");
+  const [perKeyCredits, setPerKeyCredits] = useState("1");
   const [slug, setSlug] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -68,21 +67,14 @@ export default function NewEventPage() {
         <h1 className="font-heading text-2xl font-semibold tracking-tight">
           New event
         </h1>
-        <p className="text-muted-foreground text-sm">
-          Per-key limit is the OpenRouter spending limit in USD for each
-          attendee key.
-        </p>
       </div>
 
       <Card>
         <form onSubmit={onSubmit}>
           <CardHeader>
             <CardTitle>Details</CardTitle>
-            <CardDescription>
-              URL slug is optional; one is generated from the name if omitted.
-            </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4 pb-4">
+          <CardContent className="space-y-4 pb-4 pt-3">
             {error ? (
               <Alert variant="destructive">
                 <AlertDescription>{error}</AlertDescription>
@@ -100,6 +92,9 @@ export default function NewEventPage() {
             </div>
             <div className="space-y-2">
               <Label htmlFor="date">Date</Label>
+              <p className="text-muted-foreground text-sm">
+                Keys will be valid through the end of the UTC day following this date.
+              </p>
               <Input
                 id="date"
                 type="date"
@@ -110,6 +105,9 @@ export default function NewEventPage() {
             </div>
             <div className="space-y-2">
               <Label htmlFor="credits">Per-key credit limit (USD)</Label>
+              <p className="text-muted-foreground text-sm">
+                OpenRouter usage limit per attendee key in USD.
+              </p>
               <Input
                 id="credits"
                 type="number"
@@ -122,6 +120,9 @@ export default function NewEventPage() {
             </div>
             <div className="space-y-2">
               <Label htmlFor="slug">Slug (optional)</Label>
+              <p className="text-muted-foreground text-sm">
+                One will be generated from the event name if omitted.
+              </p>
               <Input
                 id="slug"
                 value={slug}

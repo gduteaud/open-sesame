@@ -5,7 +5,11 @@ import { attendees, events } from "@/db/schema";
 import { db } from "@/lib/db";
 import { normalizeEmail } from "@/lib/email";
 import { provisionOpenRouterKey } from "@/lib/openrouter";
-import { utcCalendarDateToday, isKeyClaimAllowedForEventDate } from "@/lib/event-claim-window";
+import {
+  utcCalendarDateToday,
+  isKeyClaimAllowedForEventDate,
+  openRouterKeyExpiresAtIso,
+} from "@/lib/event-claim-window";
 import { isUuidString } from "@/lib/uuid";
 
 const bodySchema = z.object({
@@ -140,6 +144,7 @@ export async function POST(request: Request) {
       const { key, hash } = await provisionOpenRouterKey({
         name: keyName,
         limitUsd,
+        expiresAtIso: openRouterKeyExpiresAtIso(event.eventDate),
       });
 
       await tx
