@@ -1,36 +1,69 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Open Sesame
 
-## Getting Started
+API key management for **OpenRouter**: create events, import attendees (CSV or one-by-one), set a **per-key USD spending limit**, and let attendees **claim** their own OpenRouter API key (one key per email per event).
 
-First, run the development server:
+## Stack
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- Next.js (App Router), TypeScript, Tailwind, shadcn/ui
+- Drizzle ORM + PostgreSQL ([Supabase](https://supabase.com) free tier works well)
+- Deploy on [Vercel](https://vercel.com) (Hobby / free)
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Setup
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+1. **Clone & install**
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+   ```bash
+   npm install
+   ```
 
-## Learn More
+2. **Environment** — copy `.env.example` to `.env.local` and fill in:
 
-To learn more about Next.js, take a look at the following resources:
+   - `DATABASE_URL` — Supabase connection string (use the **transaction** pooler on port `6543` with `?pgbouncer=true` if you use `postgres.js` in serverless).
+   - `OPENROUTER_MANAGEMENT_KEY` — from [OpenRouter management keys](https://openrouter.ai/settings/management-keys).
+   - `ADMIN_PASSWORD` — plain password for local dev, or a **bcrypt** hash for production.
+   - `NEXTAUTH_SECRET` — long random string for signing the admin cookie.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+3. **Database schema**
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+   ```bash
+   npm run db:push
+   ```
 
-## Deploy on Vercel
+   (Or use `npm run db:generate` + your migration workflow.)
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+4. **Run**
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+   ```bash
+   npm run dev
+   ```
+
+   - Home: [http://localhost:3000](http://localhost:3000)
+   - Admin: [http://localhost:3000/admin/login](http://localhost:3000/admin/login)
+   - Attendee claim: [http://localhost:3000/claim](http://localhost:3000/claim)
+
+5. **Claim links in production** — set `NEXT_PUBLIC_APP_ORIGIN` to your public URL (e.g. `https://your-app.vercel.app`) so the organizer dashboard shows the correct shareable link.
+
+## CSV format
+
+Header row required:
+
+| first_name | last_name | email           |
+| ---------- | --------- | --------------- |
+| Ada        | Lovelace  | ada@example.com |
+
+Duplicate `(event, email)` rows are skipped on import.
+
+## Security notes
+
+- Admin routes are protected by an HTTP-only JWT cookie.
+- Provisioned OpenRouter keys are stored in the database; restrict DB access and use strong secrets in production.
+- Attendee flow is **email allowlist only** (no magic link); consider rate limiting at the edge for `/api/claim` if you expose it publicly.
+
+## Scripts
+
+| Command            | Description        |
+| ------------------ | ------------------ |
+| `npm run dev`      | Development server |
+| `npm run build`    | Production build   |
+| `npm run db:push`  | Push schema to DB  |
+| `npm run db:studio`| Drizzle Studio     |
